@@ -17,6 +17,8 @@ Red HatとAWSは、顧客がAWSネイティブサービスと統合しながらR
 
 
 
+### Index:
+
 [Workshop Overview](index-aws.ja.md)
 
 [Get started with OpenShift](exercises/10-openshift-intro.ja.md)
