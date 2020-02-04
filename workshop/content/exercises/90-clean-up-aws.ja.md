@@ -52,7 +52,7 @@ oc delete all --all &
 
 これを行うには、GitHub.comにログインして``flask-vote-app``リポジトリを見つけ、リポジトリをクリックし``Settings``、ページの下部にある``Delete this Repository``ボタンをクリックします。
 
-また、 https://github.com/settings/tokensへアクセスして、``hub for...``というトークンを削除します.  
+また、 https://github.com/settings/tokens　へアクセスして、　``hub for...`` というトークンを削除します.  
 
 ## Remove the local GitHub personal access token  
 このワークショップの開始時に、GitHubリポジトリをフォークしました。リポジトリにさらにアクセスできるようにするために、トークンが生成されました。次に、このトークンを削除します:
