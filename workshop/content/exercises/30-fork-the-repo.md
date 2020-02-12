@@ -1,48 +1,46 @@
-Is this exercise you will fetch the source code that will be used for this exercise and for some of the following, exercises.  
+この演習では、この演習および以降の演習で使用されるソースコードを取得します。
 
-You will make a copy (fork) of the source code repository in GitHub and then build and deploy it to OpenShift.   The application we will use is a simple voting application which collects answers to a simple question from users and displays the collected results. 
+GitHubでソースコードリポジトリのコピー（フォーク）を作成し、ビルドしてOpenShiftにデプロイします。使用するアプリケーションは、ユーザーからの単純な質問に対する回答を収集し、収集した結果を表示する単純な投票アプリケーションです。
 
 ## Fork the repository 
+まず、自分のGitHubアカウントにソースコードリポジトリを設定します。次のステップでGitHubのユーザー名とパスワードが必要になります。アカウントをお持ちでない場合は、まず[http://github.com/join](https://github.com/join)でサインアップしてから戻って、こちらの手順に従ってください。ユーザー名とパスワードを忘れないでください！
 
-First, set up a source code repository in your own GitHub account.  You will need your GitHub username and password for the next step.  If you don't have an account, first sign up for one at [http://github.com/join](https://github.com/join) and then come back and follow the instructions here. Be sure to remember the username and password!
+ - ``Githubは、gitとして知られるオープンソースのバージョン管理システムをベースとしたサイトです。他のバージョン管理ソフトと同様にgitはリポジトリのファイルに対する変更を追跡するのに役立ちます。`` 
 
- - ``Note: Github is a site based on an open source version control system known as git, like other version control software git helps with tracking changes to a repository of files.`` 
-
-First, ensure you are in the top level home directory:
+まず、最上位のホームディレクトリにいることを確認します：
 
 ```execute 
 cd ~/ 
 ```
+次の手順では、GitHubリポジトリ``flask-vote-app``をあなたのGitHubアカウントにフォークします。flask-vote-appリポジトリには、Flaskと呼ばれるPython Webアプリケーションフレームワークに基づいた投票アプリケーションが含まれています。
 
-The next step will fork the GitHub repository ``flask-vote-app`` into your GitHub account.  The flask-vote-app repository contains a voting application based on the Python web application framework called Flask. 
-
-Run the next helper script and enter your GitHub username and password when prompted:
+次のヘルパースクリプトを実行し、プロンプトが表示されたらあなたのGitHubのユーザー名とパスワードを入力します:
 
 ```execute 
 fork-repo sjbylo/flask-vote-app
 ```
 
- - ``Note``: This command will also generate a GitHub personal access token - scoped only to the forked repository - which will be used in the further exercises. It will be removed from the workshop environment in the final clean-up exercise.  
+ - ``Note``: のコマンドは、GitHubの個人アクセストークンも生成します-フォークされたリポジトリのみにスコープが設定されます-これは、以降の演習で使用されます。最終的なクリーンアップ演習でワークショップ環境から削除されます。  
 
-You should now have your own GitHub repository containing the example source code. 
+これで、サンプルのソースコードを含む独自のGitHubリポジトリができました。 
 
 ```execute
 ls -ld flask-vote-app 
 ```
 
-Change into the new repository directory:
+新しいリポジトリディレクトリに移動します:
 
 ```execute
 cd flask-vote-app
 ```
 
-Run this command to verify the new repository belongs to you.  
+このコマンドを実行して、新しいリポジトリが自分のものであることを確認します。  
 
 ```execute
 git remote -v
 ```
 
-You should see your GitHub username in the output. For example:
+出力にGitHubユーザー名が表示されます。例えば:
 
 ```
 origin ...github.com/joe/flask-vote-app.git (fetch)
@@ -50,8 +48,9 @@ origin ...github.com/joe/flask-vote-app.git (push)
 ```
 
 ---
-That's the end of this exercise.
+これでこの演習は終わりです。
 
-Now you have forked the source code, the next exercise will get that code running on OpenShift. 
+これでソースコードを分岐しました。次の演習では、そのコードをOpenShiftで実行します。 
 
 
+[indexへ戻る](../index-aws.ja.md)

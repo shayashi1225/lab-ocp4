@@ -1,6 +1,7 @@
-In this exercise you will launch a database ``in a container`` and configure your application to use the database instead of the default built-in database.
+この演習では、データベースを``コンテナの中で``起動し、デフォルトの組み込みデータベースの代わりにこのデータベースを使用するようにアプリケーションを構成します。
 
-First, ensure only one replica of the application is running:
+
+まず、アプリケーションのレプリカが1つだけ実行されていることを確認します。:
 
 ```execute
 oc scale dc vote-app --replicas=1
@@ -8,9 +9,10 @@ oc scale dc vote-app --replicas=1
 
 # Launch the database in a container
 
-Launch a MySQL database and connect the application to it.  MySQL is a freely available open source Relational Database Management System (RDBMS) that uses Structured Query Language (SQL). 
+MySQLデータベースを起動し、アプリケーションをそれに接続します。MySQLは、Structured Query Language（SQL）を使用する、無料で利用可能なオープンソースのリレーショナルデータベース管理システム（RDBMS）です。
 
-Run this to start a MySQL container:
+これを実行してMySQLコンテナーを開始します。
+
 
 ```execute
 oc new-app --name db mysql:5.7 \
@@ -19,23 +21,23 @@ oc new-app --name db mysql:5.7 \
    -e MYSQL_DATABASE=vote 
 ```
 
-MySQL will be started and configured with a database called ``vote`` and with ``user`` and `password` credentials, as stated in the above command parameters. 
+MySQLは、上記のコマンドパラメータで指定した``user``と``password``資格情報を持つ``vote``と呼ばれるデータベースで構成されます。
 
-Take a look at the log output:
+ログ出力を見てください：
 
 ```execute
 oc logs dc/db
 ```
 
-It will take about 30 seconds for the database to be running.  You will see `ready for connections` in the log output.  If not, try the above ``oc logs`` command again. 
+データベースが実行されるまで約30秒かかります。ログ出力に``ready for connections``が表示されルはずです。そうでない場合は、上記の``oc logs``コマンドを再試行してください。
 
-Once the database is up and running, verify that by checking if the ``vote`` database exists:
+データベースが稼働したら、voteデータベースが存在するかどうかを確認して確認します：
 
 ```execute
 mysql -h db.%project_namespace%.svc -u user -ppassword -D vote -e "show databases"
 ```
 
-- You should see the following.  If not, wait for the database to come up and/or check the above and try again. 
+- 以下が表示されます。そうでない場合は、データベースが起動するまで待機するか、上記を確認してから再試行してください。 
 
 ```
 +--------------------+
@@ -48,18 +50,17 @@ mysql -h db.%project_namespace%.svc -u user -ppassword -D vote -e "show database
 
 ## Connect the application to the database 
 
-First of all, look at the output of the current vote app:
+まず、現在の投票アプリの出力を見てください:
 
 ```execute
 oc logs dc/vote-app | grep ^Connect 
 ```
 
-You can see that it's using ``sqlite`` (an internal database) to store it's data.  We will change this below. 
+データを保存するために``sqlite``（内部データベース）を使用していることがわかります。これを以下で変更します。
 
-At this point, the application is unaware of the existence of the MySQL database!  You need to re-configure the application to use the new database. 
-To do that we will change the vote application's environment variables and re-launch the pod.  The vote application looks for the existence of the environment variables at startup and uses them to configure itself.  If database credentials are defined the application connects to the database and provisions the needed tables and data. 
+この時点では、アプリケーションはMySQLデータベースの存在を認識していません！新しいデータベースを使用するには、アプリケーションを再構成する必要があります。これを行うには、投票アプリケーションの環境変数を変更し、Podを再起動します。投票アプリケーションは、起動時に環境変数の存在を探し、それらを使用して自身を構成します。データベース資格情報が定義されている場合、アプリケーションはデータベースに接続し、必要なテーブルとデータをプロビジョニングします。
 
-Connect the application to the database:
+アプリケーションをデータベースに接続します：
 
 ```execute
 oc set env dc vote-app \
@@ -71,15 +72,16 @@ oc set env dc vote-app \
    DB_TYPE=mysql
 ```
 
-The above command sets the environment variables `as stated in the arguments`. The deployment configuration restarts the pod automatically because of the configuration change.
+上記のコマンドは、起動時の引数として環境変数を設定します。構成の変更により、deployment configurationはPodを自動的に再起動します。
 
-Check that the application is running properly and was able to connect to the database:
+アプリケーションが正常に実行されており、データベースに接続できたことを確認します:
 
 ```execute
 oc logs dc/vote-app 
 ```
 
-You should see the following in the output, showing the database credentials used.  If not, wait and try the ``oc logs`` command again.
+出力に次の内容が表示され、使用されているデータベース資格情報が表示されます。そうでない場合は、待ってから``oc logs``コマンドを再試行してください。
+
 
 ```
 ---> Running application from Python script (app.py) ...
@@ -87,7 +89,7 @@ Connect to : mysql://user:password@db:3306/vote
 ...
 ```
 
-Check that the database is now populated with the vote application tables:
+データベースに投票アプリケーションテーブルが作成されていることを確認します。
 
 <!--
 POD=`oc get pods --selector app=workspace -o jsonpath='{.items[?(@.status.phase=="Running")].metadata.name}'`; echo $POD
@@ -99,7 +101,7 @@ kubectl get pods --field-selector=status.phase=Running -o name
 mysql -h db.%project_namespace%.svc -u user -ppassword -D vote -e "show tables"
 ```
 
-You should see the  ``poll`` and ``options`` tables. 
+pollとoptionsテーブルが存在するはずです。
 
 ```
 +----------------+
@@ -119,14 +121,14 @@ POD=`oc get pods --selector app=workspace -o jsonpath='{.items[?(@.status.phase=
 
 # Test the application 
 
-Post a few random votes to the application using the test script:
+テストスクリプトを使用して、ランダムな投票をアプリケーションに投稿します:
 
 ```execute 
 test-vote-app http://vote-app-%project_namespace%.%cluster_subdomain%/vote.html
 ```
-(This script can be run multiple times if you wish to make more votes).
+（このスクリプトは、さらに投票する場合は複数回実行できます）。
 
-To view the results use the following command. You should see the votes:
+結果を表示するには、次のコマンドを使用します。投票が表示されるはずです。:
 
 <!--
 ```execute 
@@ -138,7 +140,8 @@ curl -s http://vote-app-%project_namespace%.%cluster_subdomain%/results.html | g
 mysql -h db.%project_namespace%.svc -u user -ppassword -D vote -e 'select * from `option`;'
 ```
 
-  - ``Note:`` Should the application not work as expected, see below for troubleshooting instructions. 
+  - ``Note:`` アプリケーションが期待どおりに動作しない場合のトラブルシューティングの手順についてはページの最後を参照してください。
+
 
 ```
 +----+------------------------------+---------+-------+
@@ -157,29 +160,27 @@ mysql -h db.%project_namespace%.svc -u user -ppassword -D vote -e 'select * from
 +----+------------------------------+---------+-------+
 ```
 
-View the containers/pods in the console:
+コンソールでコンテナ/Podを表示します:
 
 * [View the Pods](%console_url%/k8s/ns/%project_namespace%/pods) 
 
-Open the vote application results page in a browser: 
+ブラウザで投票アプリケーションの結果ページを開きます: 
 
 * [Open the Application](http://vote-app-%project_namespace%.%cluster_subdomain%/results.html) 
 
+これで、アプリケーションは組み込みのデータベースに依存しなくなり必要に応じて自由にスケールアウト（``コンテナの追加``）ができます。
+コンソールに移動し、アプリケーションポッドを1から3にスケーリングします（3を超えてスケ​​ーリングしないでください）。Deployment Config：``vote-app``のメニューからpod ``count``を変更します。
 
-
-Now, the application is no longer dependent on the built-in database and can freely scale out - `add containers` - as needed. 
-
-Go to the console and scale the application pods from 1 to 3 (please do not scale to more than 3).  Change the pod ``count`` via the menu of the Deployment Config called ``vote-app``. 
 
 * [Deployment Configs](%console_url%/k8s/ns/%project_namespace%/deploymentconfigs)
 
-You can also use the following command:
+次のコマンドも使用できます:
 
 ```execute
 oc scale dc vote-app --replicas=3
 ```
 
-After 30-60 seconds, you should see the output in the lower window, similar to this:
+30〜60秒後に、下のウィンドウに次のような出力が表示されます:
 
 ```
 vote-app-3-52kqp    1/1     Running     0          17s
@@ -187,52 +188,55 @@ vote-app-3-nb5fk    1/1     Running     0          17s
 vote-app-3-p2j4w    1/1     Running     0          7m45s
 ```
 
-- Note that all the `state` of the application is stored in the database. Each container/pod is therefore `stateless` and can be freely stopped and started, as needed. 
+- すべてのアプリケーション`state`がデータベースに保存されていることに注意してください。したがってstatelessな各コンテナ/Podは必要に応じて自由に停止および開始できます。
 
-Check the application is still working as expected.  Data should not be lost: 
+アプリケーションが期待どおりに動作していることを確認します。データは残ります：
 
 [Open the Vote Application](http://vote-app-%project_namespace%.%cluster_subdomain%/results.html) 
 
- - ``Please remember to scale the vote application back down to 1 or use the following command:``
+ - ``投票アプリケーションを1に戻すか、次のコマンドを使用することを忘れないでください:``
 
 ```execute
 oc scale dc vote-app --replicas=1
 ```
 
 ---
-That's the end of this exercise.
+これでこの演習は終わりです。
 
-In this exercise you have launched a database for testing purposes and connected the application to it.  
+この演習では、テスト目的でデータベースを起動し、アプリケーションをそれに接続しました。
 
-Now move on to the next exercise. 
+次の演習に進みます。
 
 ---
 ### Troubleshooting instructions
 
-Is the vote application working? 
+投票アプリケーションは機能していますか？
 
-When the application starts for the first time and initializes the database the log output should look like this:
+アプリケーションが初めて起動してデータベースを初期化すると、ログ出力は次のようになります：
 
 ![log output 1](images/vote-app-start-1.png)
 
-When the application restarts the log output should look like this:
+アプリケーションが再起動すると、ログ出力は次のようになります：
 
 ![log output 1](images/vote-app-start-2.png)
 
-Do you see any error messages in the output? 
+出力にエラーメッセージが表示されていますか？
 
-If the issue can't be fixed, empty the database and restart the application using the following command: 
+問題を修正できない場合は、データベースを空にして、次のコマンドを使用してアプリケーションを再起動します: 
 
 ```execute 
 delete-test-database
 ```
 
-If the issue still can't be fixed, recreate the database and restart the application using the following command: 
+それでも問題を解決できない場合は、次のコマンドを使用してデータベースを再作成し、アプリケーションを再起動します。: 
 
 ```execute 
 recreate-test-database
 ```
 
-After the script has completed return to the instructions and try again.
+スクリプトが完了したら、指示に戻って再試行してください。
 
 <!-- drop table `option`;  delete from `option`;  -->
+
+
+[indexへ戻る](../index-aws.ja.md)

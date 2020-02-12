@@ -1,129 +1,130 @@
-In this exercise you will learn how to manage the deployment process. 
+この演習では、deploymentプロセスを管理する方法を学習します。
 
- - Note: ``This exercise is optional.`` 
+ - Note: ``この演習はオプションです。`` 
 
-Ensure the application is scaled to 3 containers/pods: 
+アプリケーションが3つのコンテナー/podにスケーリングされていることを確認します。: 
 
 ```execute
 oc scale --replicas=3 dc/vote-app
 ```
 
-Throughout this exercise, you can see the scaling/rollout action in the [console](%console_url%/k8s/ns/%project_namespace%/pods). 
+この演習を通して、[console](%console_url%/k8s/ns/%project_namespace%/pods)でスケーリング/ロールアウトアクションを確認できます。
 
 ```execute
 oc get pods
 ```
 
-Test the application to check it's still working as expected: 
+アプリケーションをテストして、期待どおりに動作することを確認します: 
 
 ```execute 
 curl -s http://vote-app-%project_namespace%.%cluster_subdomain%/ | grep "<title>"
 ```
 
-See in other window ... 
+もう一つのウィンドウで確認... 
+まず下のターミナルで実行されている``watch``コマンドを停止します。
 
-First stop the ``watch`` command running in the lower terminal:
 
 ```execute-2
 <ctrl+c>
 ```
 
-Execute this command in the lower terminal which will watch ``rollout history``:
+監視する下の端末で``rollout history``を監視するためにこのコマンドを実行します:
 
 ```execute-2
 watch oc rollout history dc vote-app
 ```
 
-DeploymentsConfigs (Kubernetes Objects) provide fine-grained management over common user applications. If you wish, please read more about [OpenShift Deployment Configs](https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html).  Let's try it out. 
+DeploymentsConfigs（Kubernetesオブジェクト）は、一般的なユーザーアプリケーションに対するきめ細かい管理を提供します。必要に応じて、[OpenShift Deployment Configs](https://docs.openshift.com/container-platform/3.11/dev_guide/deployments/how_deployments_work.html)の詳細を確認してください。試してみましょう。
 
-Roll out the application again: 
+アプリケーションを再度ロールアウトします: 
 
 ```execute
 oc rollout latest vote-app
 ```
 
-This will deploy the ``same version`` of the application again. 
-Also, this will create a new deployment ``revision``. Look into the lower terminal to see the new revision. 
+これにより、``同じバージョン``のアプリケーションが再びデプロイされます。また、これにより新しい``リビジョン``のデプロイメントが作成されます。下の端末を見て、新しいリビジョンを確認します。
 
-You should see:
+以下を確認します:
 
 ```
 ...   Running         manual change
 ```
 
-Wait for the application to be rolled out and ``Running`` again. 
+アプリケーションがロールアウトされ、再度``Running``となるのを待ちます。
 
-Rollback (undo) the deployment: 
+deploymentのロールバック（取り消し）：
 
 ```execute
 oc rollout undo dc vote-app
 ```
 
-This will roll back the application to the previous version. 
+これにより、アプリケーションが以前のバージョンにロールバックされます。
 
-Rollout the application again: 
+アプリケーションを再度ロールアウトします：
 
 ```execute
 oc rollout latest vote-app
 ```
 
-If a rollout is not going as planned you can cancel it.  Try that now:
+ロールアウトが計画どおりに進まない場合は、キャンセルできます。今すぐ試してください：
 
 ```execute
 oc rollout cancel dc vote-app
 ```
 
-Rollback (undo) the deployment to one of the earlier versions of the application, revision 2: 
+アプリケーションの以前のバージョン、リビジョン2へのdeploymentをロールバック（取り消し）します： 
 
 ```execute
 oc rollout undo dc vote-app --to-revision=2
 ```
 
-You should see a new rollout is ``Running``.  
+新しいロールアウトが``Running``と表示されるはずです。
 
-Wait for the application to be rolled back and ``Running`` again. Check with this command:
+アプリケーションがロールバックされ、再度``Running`` となるのを待ちます。このコマンドで確認してください:
 
 ```execute
 oc get pod
 ```
 
-If you remember, the 2nd ever deployment of the application was  using the MySQL in the containerized database.  If you look at the application log output you should now see it using the containerized database again. 
+覚えているなら、アプリケーションの2回目のデプロイメントでは、コンテナ化されたデータベースでMySQLを使用していました。アプリケーションログ出力を見ると、コンテナ化されたデータベースを再度使用して表示されているはずです。
 
-Look at the log output to check which database it's using:
-
+ログ出力を見て、使用しているデータベースを確認します：
 ```execute
 oc logs dc/vote-app 
 ```
 
-You should see the following amongst the log output: 
+ログ出力の中で次が表示されるはずです: 
 
 ```
 Connect to : mysql://user:password@db:3306/vote
 ```
 
-Note, if you don't see the expected output, wait for the application to be ``Running`` again. 
+予想される出力が表示されない場合は、アプリケーションが再び``Running``と表示されるまで待ちます。
 
-If you are interested, try to rollback to revision 1 and check that the application is using the internal sqlite built-in database: 
+興味がある場合は、リビジョン1にロールバックして、アプリケーションが内部sqlite組み込みデータベースを使用していることを確認してください: 
 
 ```execute
 oc rollout undo dc vote-app --to-revision=1
 ```
 
-Wait for the rollout to finish and check the output log again:
+ロールアウトが完了するのを待って、出力ログを再度確認します:
 
 ```execute
 oc logs dc/vote-app 
 ```
 
-You should see the following amongst the log output: 
+ログ出力の中で次が表示されるはずです: 
 
 ```
 Connect to : sqlite:////opt/app-root/src/data/app.db
 ```
 
-In this exercise you were able to easily rollout new versions of the application and also rollback to older versions. 
+この演習では、アプリケーションの新しいバージョンを簡単にロールアウトし、古いバージョンにロールバックすることもできました。
 
 ---
-That's the end of this exercise.
+これでこの演習は終わりです。
 
-Please move on to the next exercise.  
+次の演習に進んでください。
+
+
+[indexへ戻る](../index-aws.ja.md)

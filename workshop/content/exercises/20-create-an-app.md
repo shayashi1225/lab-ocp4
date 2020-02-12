@@ -1,57 +1,55 @@
-In this exercise, you will try out how to deploy a containerized application via the web console. OpenShift Container Platform offers different ways to deploy your applications. You can deploy a container image; or point OpenShift Container Platform to a source code repository to build and deploy the application. It also allows you to deploy an entire workload via Templates. In this exercise, we will see how easy it is to deploy a simple container image via the web console.
+この演習では、Webコンソールを使用してコンテナ化されたアプリケーションをデプロイする方法を試します。OpenShift Container Platformは、アプリケーションをデプロイするさまざまな方法を提供します。コンテナイメージを展開できます。または、OpenShift Container Platformをソースコードリポジトリにポイントして、アプリケーションをビルドおよびデプロイします。また、テンプレートを使用してワークロード全体を展開できます。この演習では、Webコンソールを介して簡単なコンテナーイメージを展開するのがいかに簡単かを確認します。
 
-On the 'Console' tab, click on 'Home' -> ['Projects'](%console_url%) . You will see the project that was created for you. You will deploy your applications in this project.
+'Home' -> ['Projects'](%console_url%) をクリックします。作成されたプロジェクトが表示されます。このプロジェクトにアプリケーションをデプロイします。
 
 ![project](images/deploy-img1.png)
 
-Click on the project and you will be brought to the project console which shows that there is no workload running.
+プロジェクトをクリックすると、実行中のワークロードがないことを示すプロジェクトコンソールが表示されます。
 
-Now switch to the ``Developer`` perspective by clicking on the ``Administrator`` left-menu item at the top and selecting ``Developer``.  You will see the Developer perspective which focuses on everything that a developer would be concerned about.
+次に、上部の左メニュー項目の``Administrator``をクリックして``Developer``選択し、``Developer``パースペクティブに切り替えますDeveloper。開発者が懸念するすべてのものに焦点を当てたDeveloperパースペクティブが表示されます。
 
-You can now deploy a container by clicking on the ``+Add`` menu item.
-
-To deploy a container image, click on '+Add' in the left menu.
+``+Add``メニュー項目をクリックしてコンテナを展開できます。
+コンテナイメージを展開するために、左側のメニューで'+Add'をクリックします。
 
 ![project](images/exercise-2-1.png)
 
-On the deploy 'Container Image' page, enter:
+Deploy Imageページで次のように入力します:
 
 ```copy
 openshiftroadshow/parksmap-katacoda:1.2.0
 ```
+’Image Name'テキストボックスに入力し、横にある拡大クラスアイコンをクリックします。これにより、Dockerハブからのクエリがトリガーされ、イメージ情報がプルダウンされます。
 
-into the 'Image Name' text box and click on the magnifying class icon at the side. This will trigger a query from Docker hub to pull down the image information.
+``Application Name``および``Name``フィールドに「myapp」を入力します。
 
-Enter an "myapp" for the ``Application Name`` and also for the ``Name`` fields. 
+'Create'ボタンをクリックして、OpenShiftにコンテナーイメージをデプロイします。バックグラウンドで、OpenShiftはイメージをプルダウンし、必要なOpenShiftオブジェクト（service、deploymentConfig）を作成し、イメージをデプロイします。
 
-Click on 'Create' button to deploy the container image on OpenShift. Behind the scenes, OpenShift will pull down the image, create the necessary OpenShift objects (services, deploymentConfig) and deploy the image.
 
 ![project](images/exercise-2-2.png)
 
-You will be lead to the Topology view showing your application.
+アプリケーションを表示するトポロジビューが表示されます。
 
 ![project](images/exercise-2-3.png)
 
-Click on the application donut to open up a side menu with more information.
+アプリケーションドーナツをクリックして、詳細情報のあるサイドメニューを開きます。
 
 ![project](images/exercise-2-5.jpeg)
 
+Routeオブジェクトに関する情報を表示するページに移動します。Locationページの右側のセクションの下には、アプリケーションにアクセスするためのURLがあります。
 
-You will be lead to the page displaying information on the Route object.  Under the ```Location``` section on the right of the page, is the URL to access the application.
-
-Click on the URL to access the application.  The application simply displays a map of the world.  If you see that, the application is running successfully!!
+URLをクリックして、アプリケーションにアクセスします。アプリケーションは、単に世界の地図を表示します。表示された場合、アプリケーションは正常に動いています!!
 
 ![project](images/deploy-img-e.png)
 
-You have just got your first application running on OpenShift.  Congratulations!
+OpenShiftで最初のアプリケーションを実行しました。おめでとうございます！
 
-Clean up the resources for this exercise, you won't be using them anymore.
+この演習のためにリソースをクリーンアップします。これ以上使用することはありません。
 
 ```execute
 oc delete all --all
 ```
 
-In your terminal you should see all the configurations and objects being deleted. You will see similar output to the following:
+ターミナルで、削除されているすべての構成とオブジェクトが表示されます。次のような出力が表示されます:
 
 ```
 pod "parksmap-katacoda-1-9f8xx" deleted
@@ -63,4 +61,7 @@ imagestream.image.openshift.io "parksmap-katacoda" deleted
 route.route.openshift.io "myname" deleted
 ```
 
-This concludes the section of the Lab.
+これで、ラボのセクションは終了です。
+
+
+[indexへ戻る](../index-aws.ja.md)

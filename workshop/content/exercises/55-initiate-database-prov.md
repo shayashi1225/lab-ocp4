@@ -1,16 +1,17 @@
-In this exercise you will provision an AWS Relational Database Service (RDS) instance so that - ``in a later exercise`` - you can configure your application to use it.  Amazon RDS makes it easy to set up, operate, and scale MySQL deployments in the cloud. 
+この演習では、AWS Relational Database Service（RDS）インスタンスをプロビジョニングします。これにより後の演習でアプリケーションを設定して使用できるようになります。Amazon RDSを使用すると、クラウドでのMySQLデプロイメントのセットアップ、運用、およびスケーリングが簡単になります。
 
-We will use the ``AWS Service Broker`` to provision the database.
+``AWS Service Broker``を使用してデータベースをプロビジョニングします。
 
-- ``The AWS Service Broker is an open source project that allows native AWS services to be exposed directly through Red Hat OpenShift and Kubernetes. The Broker provides simple integration of AWS Services directly within OpenShift.``
+
+- ``AWS Service Brokerは、Red Hat OpenShiftおよびKubernetesを介してネイティブAWSサービスを直接公開できるようにするオープンソースプロジェクトです。ブローカーは、OpenShift内でのAWSサービスの簡単な統合を直接提供します。``
 
 ![AWS Service Broker Arch](images/aws-service-broker-architecture.png)
 
-Using the ``AWS Broker`` - which is configured and running on this OpenShift cluster - provision an AWS RDS MySQL service.  Connect the MySQL database to the application and test it. 
+このOpenShiftクラスター上で構成され実行されている``AWS Broker``を使って、AWS RDS MySQLサービスをプロビジョニングします。そしてMySQLデータベースをアプリケーションに接続してテストします。
 
 # Provision a RDS MySQL database using the service catalogue 
 
-To initiate the provisioning of RDS run the following ``svcat`` command: 
+RDSのプロビジョニングを開始するには、次の``svcat``コマンドを実行します。: 
 
 ```execute
 svcat provision mysql --class rdsmysql --plan custom  \
@@ -27,37 +28,45 @@ svcat provision mysql --class rdsmysql --plan custom  \
 ```
  <!-- -p VpcId=vpc-03a00c0e08cc9bec3  note that this param is not needed.  The AWS Service Broker should be configured with the target VPN -->
 
-As specified in the above command, an instance of MySQL will be provisioned with an instance type of ``db.m4.large`` and will be accessible publicly. 
+上記のコマンドで指定されているように、MySQLのインスタンスは``db.m4.large``のインスタンスタイプでプロビジョニングされ、パブリックにアクセスできます。
 
-Check the status of the RDS instance from the command line:
+コマンドラインからRDSインスタンスのステータスを確認します:
 
 ```execute
 svcat get instances
 ```
 
-The status should be ``Provisioning``.  Note that the database takes about 20 minutes to provision. We will use it in a later exercise. 
+ステータスは``Provisioning`である必要があります。データベースのプロビジョニングには約20分かかることに注意してください。後の演習で使用します。
 
-If you wish to explore in the console, go to the [Service Catalog](%console_url%/catalog/ns/%project_namespace%). You will see many technologies which can be utilized.  One of them is the RDS Service.  In the search box, enter ``rds``.  You will see the ``Amazon RDS for MySQL`` service class.  Click on this "Amazon RDS for MySQL" to read information about this service.  Then click on the ``Create Service Instance``  button to view all of the parameters that _can_ be used to define the MySQL instance.  The most important options are:
+コンソールで作業したい場合は、[Service Catalog](%console_url%/catalog/ns/%project_namespace%)にアクセスして作成することもできます。利用できる多くの技術が表示されます。それらの1つがRDSサービスです。検索ボックスに``rds``と入力します。``Amazon RDS for MySQL``サービスクラスが表示されます。この"Amazon RDS for MySQL"をクリックして、このサービスに関する情報を参照してください。次に、``Create Service Instance`` ボタンをクリックして、MySQLインスタンスの定義に使用できるすべてのパラメーターを表示します。最も重要なオプションは次のとおりです。
 
-1. Service Instance Name
-1. DB Instance Class
-1. Master User Password
+1. サービスインスタンス名
+1. DBインスタンスクラス
+1. マスターユーザーのパスワード
 1. DBName
-1. StorageEncrypted 
-1. Publicly Accessible
-1. Master Username
-
-``Please note: DO NOT fill in this form and DO NOT click on the "Create" button at the bottom of the page!``  You already provisioned the RDS instance above using the ``svcat`` command. 
-
-Take a look in the console at the [Provisioned Services](%console_url%/provisionedservices/ns/%project_namespace%/) and check the status of the RDS instance.  You should see ``Not ready``.  If you drill down into the ``mysql`` service object you should also be able to see ``The instance is being provisioned asynchronously`` at the bottom of the page.   You will also see that there are no ``Service Bindings``. A service binding is a link between a service instance and an application.  Don't worry, we will create that in a future exercise.  
+1. StorageEncrypted
+1. 一般にアクセス可能
+1. マスターユーザー名
 
 
- - Sometimes, the RDS instance fails to provision due to overlapping network segments being automatically selected (or some other reason).  In this case you will eventually see the status as ``Failed``.  
- - If there is a problem provisioning the RDS instance, you will need to remove it and try again.  To remove the failing RDS instance, run the command `"svcat deprovision mysql"`.  <!--follow the steps in the section ``Remove the RDS Instance`` in the last exercise exercise called [Clean up](90-clean-up).  -->
+``Please note: 実際にはページ下部の「作成」ボタンをクリックしないでください！`` ``svcat``コマンド を使用して、すでに上記のRDSインスタンスをプロビジョニングしています。 
 
-The database takes about 20 minutes to provision. 
+[Provisioned Services](%console_url%/provisionedservices/ns/%project_namespace%/) をコンソールで見て、RDSインスタンスのステータスを確認します。``Not ready``が表示されるはずです。``mysql``サービスオブジェクトを確認すると、``The instance is being provisioned asynchronously``と、ページの下部にも表示されるはずです。また、``Service Bindings``は何も表示されません。サービスバインディングは、サービスインスタンスとアプリケーション間のリンクです。心配しないでください。今後の演習で作成します。
+
+
+- 重複するネットワークセグメントが自動的に選択されるため（またはその他の理由）、RDSインスタンスがプロビジョニングに失敗する場合があります。この場合、最終的にステータスが``Failed``として表示されます。
+- RDSインスタンスのプロビジョニングに問題がある場合は、それを削除して再試行する必要があります。失敗したRDSインスタンスを削除するには、`"svcat deprovision mysql"`コマンドを実行します。
+
+  <!--follow the steps in the section ``Remove the RDS Instance`` in the last exercise exercise called [Clean up](90-clean-up).  -->
+
+データベースのプロビジョニングには約20分かかります。
 
 ---
 That's the end of this exercise.
 
-Once you see the instance status as `Provisioning`, move onto the next exercise.
+これでこの演習は終わりです。
+
+インスタンスのステータスが`Provisioning`として表示されたら、次の演習に進みます。
+
+
+[indexへ戻る](../index-aws.ja.md)

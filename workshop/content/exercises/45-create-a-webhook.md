@@ -1,46 +1,44 @@
-In this exercise you will configure the build to execute automatically every time source code changes are committed 
-to the repository in GitHub. This can be done using a ``webhook``.  
+この演習では、ソースコードの変更がGitHubのリポジトリにコミットされるたびに自動的に実行されるようにビルドを構成します。これは``webhook``を使用して実行できます。
 
-Note, this exercise is optional. 
+この演習はオプションです。
 
 # Create a Webhook 
 
-If you want to configure a webhook, use the following helper script.  The helper script will display all the ``values`` that you need to configure the webhook in GitHub. 
+Webhookを構成する場合は、次のヘルパースクリプトを使用します。ヘルパースクリプトはGitHubでwebhookを構成するために必要な``values``をすべて表示します。
 
-Run the helper script:
+ヘルパースクリプトを実行します：
 
 ```execute
 getwebhook vote-app %cluster_subdomain%
 ```
 
- - ``Important: Follow the instructions below and use the values displayed by the helper script.``
+ - ``Important: 以下の手順に従い、ヘルパースクリプトによって表示される値を使用します.``
 
 1. Log into https://github.com
-1. Navigate to your ``flask-vote-app`` repository
-1. Click on ``Settings`` and then on ``Webhooks``
-1. Click on the "``Add Webhook``" button and 
-1. fill in the form using the following information:
+1. あなたの``flask-vote-app`` repositoryへ移動
+1. ``Settings`` をクリックして``Webhooks``を選択
+1. "``Add Webhook``"ボタンをクリック
+1. 次の情報を使用してフォームに入力します：
 
 - Payload URL: ``see the helper script output``
 - Content type: application/json
 - Secret: ``see the helper script output``
 - SSL verification: Disabled 
 
- - ``WARNING``:  If you see the error ``The URL you've entered is not valid``, be very careful when copying and pasting the
-long URL into the GitHub form as a space might be inserted at the line-break depending on which browser you are using!
+ - ``WARNING``: エラーThe URL you've entered is not validが表示される場合は、使用しているブラウザによっては改行でスペースが挿入される可能性があるため、長いURLをGitHubフォームにコピーして貼り付ける際に注意してください！ 
 
-Leave the other settings as they are.
+他の設定はそのままにします。
 
-Finally, click on the "``Add Webhook``" button.
+最後に、"``Add Webhook``"ボタンをクリックします。
 
- - ``WARNING``:  If you see the error ``The URL you've entered is not valid``, check and remove any ``spaces`` in the
-URL that you pasted.
+ - ``WARNING``:  エラー：``The URL you've entered is not valid``が表示される場合は、貼り付けたURLを確認して``spaces`` を削除してください。
 
-GitHub will immediately test the webhook and show the result on the next page.  If you see a ``tick`` next to the webhook, that means it's working (note, you may need to refresh the page). 
+GGitHubはすぐにwebhookをテストし、次のページに結果を表示します。tickWebhookの隣に表示される場合、それは機能していることを意味します（注意、ページを更新する必要があるかもしれません）。
 
 ---
-That is the end of the exercise. 
+これで演習は終わりです。
 
-In this exercise you created a webhook so that every time you commit code to your repository in GitHub the build will be automatically triggered. 
+この演習では、GitHubのリポジトリにコードをコミットするたびにビルドが自動的にトリガーされるようにwebhookを作成しました。
 
 
+[indexへ戻る](../index-aws.ja.md)

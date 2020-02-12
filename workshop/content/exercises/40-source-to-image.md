@@ -1,27 +1,27 @@
-In this exercise you will use ``Source to Image`` to build and launch the voting application on OpenShift.
+この演習では、OpenShiftで投票アプリケーションをビルドおよび起動するために``Source to Image``を使用します。
 
-_From the very beginning, one of the main objectives of the OpenShift project was to make it really easy for developers to get code running on the platform._
+OpenShiftプロジェクトの最初の主な目的の1つは、開発者がプラットフォームでコードを実行するのを本当に簡単にすることでした。
 
-"oc new-app" is the command that initializes an application in various ways on OpenShift. 
-You will use it to get your source code running on OpenShift. 
+”oc new-app”は、OpenShiftでさまざまな方法によりアプリケーションを初期化するコマンドです。OpenShiftでソースコードを実行するために使用します。
 
-Source 2 Image (s2i) does the following: 
+Source 2 Image (s2i) は次のことを行います：
 
-1. Launches a container from a "builder image" of the matching runtime.  In this case that's a python 2.7 builder image.
-1. Executes a build of the application in the running builder container.
-1. After a successful build, s2i commits a new image containing the built application and pushes it into the internal registry of OpenShift. 
-1. The container is launched because a new image has been created.  If the container is already running from a previous build, the container will be re-deployed. 
+1. 一致するランタイムの"builder image"からコンテナを起動します。今回は、Python 2.7のビルダーイメージです。
+2. 実行中のビルダーコンテナーでアプリケーションのビルドを実行します。
+3. ビルドが成功すると、s2iはビルドされたアプリケーションを含む新しいイメージをコミットし、OpenShiftの内部レジストリにプッシュします。
+4. 新しいイメージが作成されたため、コンテナーが起動されます。コンテナが以前のビルドからすでに実行されている場合、コンテナは再デプロイされます。
 
-
-Run the following command in the lower terminal so you can view the running containers/pods during the rest of the exercises:
+下部のターミナルで次のコマンドを実行して、残りの演習中に実行中のcontainers/podsを表示します：
 
 ```execute-2
 watch "oc get pods | grep -v -e ' Completed ' -e \-deploy"
 ```
 
-This command will run for most of the exercises and should now show ``No resources found`` since we haven't created anything yet. 
+このコマンドはほとんどの演習で実行されます。今はまだ何も作成していないので``No resources found``が表示されるはずです。
 
 # Execute the Source 2 Image build process 
+
+次に``new-app`` を``--dry-run``オプションを指定してコマンドを実行し、コマンドが何をするかを確認します
 
 Now run the ``new-app`` command with the ``--dry-run`` option to see what it will do:
 
@@ -29,31 +29,26 @@ Now run the ``new-app`` command with the ``--dry-run`` option to see what it wil
 oc new-app python:2.7~. --name vote-app --dry-run
 ```
 
- - ``Note: Normally the "new-app" command would automatically select a matching builder image based on the source
-code but since our code specifically requires Python version 2.7 to function properly we explicitly provide the name
-and version of the builder image we want to use (python:2.7).``
+ - ``Note: 通常、"new-app"コマンドはソースコードに基づいて一致するビルダーイメージを自動的に選択しますが、コードが適切に機能するにはPythonバージョン2.7が特に必要であるため、使用するビルダーイメージの名前とバージョンを明示的に指定します（python： 2.7）。``
 
-The above command does the following:
+上記のコマンドは次のことを行います:
 
-1. looks into the current working directory ".", detects python source code and determines its associated GitHub repository. 
-1. creates a build object called a ``build configuration`` (BC).  The build configuration knows:
-   1. the location of the repository which holds the ``python builder image`` 
-   1. where to fetch the source code from, e.g. the GitHub repository
-   1. knows the name of the output image which will be pushed into the internal container registry (``vote-app``)
-1. creates an ``image streams`` (IS) (a.k.a. OpenShift image objects) to track the builder and the final application image
-   1. these image streams are able to detect when images are updated and trigger a rebuild or a re-deployment of the application  
-1. creates a deployment object called a ``deployment configuration`` (DC).  The deployment configuration knows:
-   1. how to re-deploy the application should the image be updated
-1. creates a ``service object`` to enable discovery and access to one or more running application containers. 
-
-
-If there are no warnings or errors and all looks well, execute the command without the ``--dry-run`` option:
+1. 現在の作業ディレクトリ"."を調べ、pythonソースコードを検出し、関連するGitHubリポジトリを決定します。
+2. ``build configuration``（BC）というビルドオブジェクトを作成します。ビルド構成は以下を認識します：
+  1. ``python builder image``を保持するリポジトリの場所 
+  2. GitHubリポジトリなどからソースコードを取得する場所
+  3. 内部コンテナレジストリにプッシュされる出力イメージの名前（``vote-app``）
+3. ``image streams``（IS）（別名OpenShiftイメージオブジェクト）を作成して、ビルダーと最終的なアプリケーションイメージを追跡します
+  1. これらのimage streamsは、画像が更新されるタイミングを検出し、アプリケーションの再構築または再展開をトリガーできます。
+4. ``deployment configuration``（DC）と呼ばれる展開オブジェクトを作成します。デプロイメント構成は以下を認識します。
+  1. イメージが更新された場合のアプリケーションの再デプロイ方法
+5. ``service object``を作成して、1つ以上の実行中のアプリケーションコンテナへの検出とアクセスを可能にします。
+警告やエラーがなく、すべてが正常に見える場合は、``--dry-run``オプションなしでコマンドを実行します:
 
 ```execute
 oc new-app python:2.7~. --name vote-app 
 ```
-
-This command will have listed out all the OpenShift objects that were created.
+このコマンドは、作成されたすべてのOpenShiftオブジェクトをリストします。
 
 <!--
 - ``Note: Should the build configuration already exists from a previous invocation, start the build again with the following command:``
@@ -63,24 +58,24 @@ oc start-build vote-app
 ```
 -->
 
-In the lower terminal window you can see the build container running.  That's the one that's building your vote application.  You should see ``vote-app-1-build   1/1     Running``. 
+下のターミナルウィンドウで、ビルドコンテナが実行されているのを確認できます。それがあなたの投票アプリケーションを構築しているものです。``vote-app-1-build   1/1     Running``と表示されるはずです。
 
-You can follow the build process in the console and also on the command line, like this:
+次のように、コンソールおよびコマンドラインでビルドプロセスを実行できます。
 
 ```execute 
 oc logs bc/vote-app --follow 
 ```
 
-To view the output of the build in the console, click on the build (``vote-app-1``) and then on the ``Logs`` tab:
+コンソールでビルドの出力を表示するには、ビルド（``vote-app-1``）をクリックしてからLogsタブをクリックします：
 
 [View the build](%console_url%/k8s/ns/%project_namespace%/builds)
 
 
 **Wait for the build to finish before continuing**.
 
-Note, the build takes a few minutes, especially the ``Copying blob...`` and the ``Storing signatures`` operations can be slow. 
+ビルドには数分かかり、特に``Copying blob...``、``Storing signatures``操作が遅くなる可能性があります。
 
-You will see the following amongst the build output:
+ビルド出力の中に次のものが表示されます:
 
 ```
 ...
@@ -94,28 +89,27 @@ Successfully pushed ...
 Push successful
 ```
 
-What happens during the build?
+ビルド中はどうなりますか？
 
-1. the source code is cloned.
-1. the python builder image is launched and the code copied into it.
-1. the s2i ``assemble script`` is executed.  It knows how to build a python application.
-1. the python dependencies are installed 
-1. the running container is committed and a new image is created
-1. the image is then pushed into OpenShift's internal container registry
+1. ソースコードが複製されます。
+2. Pythonビルダーイメージが起動し、コードがコピーされます。
+3. s2i ``assemble script``が実行されます。これはPythonアプリケーションの構築方法を知っています。
+4. Pythonの依存関係がインストールされます
+5. 実行中のコンテナがコミットされ、新しいイメージが作成されます
+6. その後、イメージはOpenShiftの内部コンテナーレジストリにプッシュされます
+ビルドが完了すると、イメージが自動的に起動され、pod内のコンテナーが作成されます。
 
-After the build has completed, the image is automatically launched and a container in a pod is created.
+下のターミナルウィンドウで、ビルドコンテナが完了し（``vote-app-1-build Completed``）、新しいアプリケーション``vote-app-1-xxyyzz``コンテナが起動しているのが見えるはずです。
 
-In the lower terminal window you should see that the build container has completed (``vote-app-1-build  Completed``) and a new application container is starting ``vote-app-1-xxyyzz``.
-
-You can also run the following command to view the pods running in your project: 
+次のコマンドを実行して、プロジェクトで実行されているポッドを表示することもできます: 
 
 ```execute
 oc get pods
 ```
 
-Wait for the build to complete. You should see (``Push successful``) in the build log output and the build pod should show ``Completed``. 
+ビルドが完了するまで待ちます。ビルドログ出力に（``Push successful``）が表示され、ビルドポッドが ``Completed``と表示されるはずです。
 
-You should see something similar to this:
+次のようなものが表示されるはずです:
 
 ```
 NAME               READY     STATUS      RESTARTS   AGE
@@ -124,16 +118,16 @@ vote-app-1-deploy  0/1       Running     0          3m
 vote-app-1-gxq5k   1/1       Running     0          30s
 ```
 
-1. The vote-app-1-build pod has completed what it was doing, namely building the python application. 
-1. The vote-app-1-deploy pod was launched to deploy the vote application pod.
-1. Now the vote-app-1-gxq5k pod has started and is ``Running``. 
+1. vote-app-1-buildポッドは、それがしていたこと、すなわちpythonアプリケーションのビルドを完了しました。
+2. 投票アプリケーションポッドをデプロイするために、vote-app-1-deployポッドが起動されました。
+3. これで、vote-app-1-gxq5kポッドが開始され``Running``となります。
 
 
-Now take a look in the console to view the running application. There should be a running pod called ``vote-app-1-xxyyzz``.  Also, drill down into the pod object and try opening a terminal window _from within the console_ to explore inside the running container by clicking into  vote-app-1-xxyyzz pod -> Terminal.  Run ``ps -ef`` inside the running container to see the running python process: 
+次に、コンソールを見て、実行中のアプリケーションを表示します。``vote-app-1-xxyyzz``と呼ばれる実行中のpodがあるはずです。また、vote-app-1-xxyyzz pod->Terminalタブをクリックして、ターミナルウィンドウを開き、実行中のコンテナーの内部を確認します。コンテナ内で``ps -ef``を実行して、実行中のpythonプロセスを確認します。: 
 
 [View the console](%console_url%/k8s/ns/%project_namespace%/pods) 
 
-You should see something like this inside the running container:
+実行中のコンテナ内に次のようなものが表示されるはずです。:
 
 ```
 (app-root)sh-4.2$ ps -ef
@@ -145,85 +139,83 @@ UID         PID   PPID  C STIME TTY          TIME CMD
 (app-root)sh-4.2$
 ```
 
-The status of your project can be seen here:
+プロジェクトのステータスは次のとおりです:
 
 [Project Status](%console_url%/overview/ns/%project_namespace%) 
 
-Here you can see the Deployment Configuration object which helps take care of the application life-cycle. 
+ここでは、アプリケーションのライフサイクルの管理に役立つDeployment Configurationオブジェクトを見ることができます。 
 
 
 # Expose the application for testing 
 
-By default, the application is not accessible from outside of OpenShift. Now, expose the application to the external network so it can be tested:
+デフォルトでは、アプリケーションはOpenShiftの外部からアクセスできません。次に、アプリケーションを外部ネットワークに公開して、テストできるようにします:
 
 ```execute
 oc expose svc vote-app
 ```
+上記のコマンドは``route``オブジェクトを作成します。OpenShift Container Platformルートは、www.example.comなどのホスト名でサービスを公開するため、外部クライアントは名前でサービスにアクセスできます。
 
-The above command  creates a ``route`` object.  An OpenShift Container Platform route exposes a service at a host name, like www.example.com, so that external clients can reach it by name. 
-
-Check the route object:
+ルートオブジェクトを確認します:
 
 ```execute 
 oc get route
 ```
 
-You should see the hostname to use to access the application. 
+アプリケーションへのアクセスに使用するホスト名が表示されます。 
 
 # Test the application 
 
-To check the application is working you can either use curl or load the URL into your browser.
+アプリケーションが機能していることを確認するには、curlを使用するか、ブラウザにURLをロードします。
 
-Use curl to check the app is working:
+curlを使用して、アプリが機能していることを確認します:
 
 ```execute 
 curl http://vote-app-%project_namespace%.%cluster_subdomain%/ 
 ```
 
-or use another way which checks for the expected output:
+または、予想される出力を確認する別の方法を使用します。:
 
 ```execute 
 curl -s http://vote-app-%project_namespace%.%cluster_subdomain%/ | grep "<title>"
 ```
 
-You should see the following output which means the application is working:
+次の出力が表示されます。これは、アプリケーションが機能していることを意味します：
 
 ```
     <title>Favourite distribution</title>
 ```
 
+アプリケーションは、ヘルパースクリプトを使用してさらにテストできます。
 
-The application can be further tested using our helper-script.
-
-Post a few random votes to the application using the help-script:
+ヘルプスクリプトを使用して、アプリケーションにランダムな投票をいくつか投稿します：
 
 ```execute 
 test-vote-app http://vote-app-%project_namespace%.%cluster_subdomain%/vote.html
 ```
 
-To view the results use the following command. You should see the totals of all the voting options:
+結果を表示するには、次のコマンドを使用します。すべての投票オプションの合計が表示されます。
 
 ```execute 
 curl -s http://vote-app-%project_namespace%.%cluster_subdomain%/results.html | grep "data: \["
 ```
 
-You should see something like the following, showing all the cast votes: 
+次のようなものが表示され、すべての票が表示されます
 
 ```
   data: [ "3",  "3",  "2",  "0",  "1",  "5",  "1",  "3",  "2", ],
 
 ```
 
-Or, view the results page in a browser:
+または、ブラウザで結果ページを表示します:
 
 [View Results page](http://vote-app-%project_namespace%.%cluster_subdomain%/results.html)
 
 
 Note that:
 
- - if the message ``Application is not available`` is displayed, this means the application is not running yet or the build has failed.
- - your neighbour should be able to access your application and submit a vote.  Note that only one vote per browser is allowed.
- - by default, the application uses a built-in database to store the vote data.  In later exercises we will configure the application to use an external MySQL database.
+ - メッセージ``Application is not available``が表示される場合、これはアプリケーションがまだ実行されていないか、ビルドが失敗したことを意味します。
+ - あなたの隣人はあなたの申請書にアクセスして投票を提出できるはずです。ブラウザごとに1つの投票のみが許可されることに注意してください。
+ - デフォルトでは、アプリケーションは組み込みデータベースを使用して投票データを保存します。後の演習では、外部MySQLデータベースを使用するようにアプリケーションを構成します。
  
 
 <!--
@@ -235,9 +227,9 @@ Click on the ``Dashboard`` button to see your resource usage in your project.
 -->
 
 ---
-That is the end of the exercise. 
+これで演習は終わりです。
 
-In this exercise you built the application and tested it. 
+この演習では、アプリケーションを構築してテストしました。
 
 
 ---
@@ -311,3 +303,5 @@ Successfully pushed //image-registry.openshift-image-registry.svc:5000/lab-ocp4/
 Push successful
 ```
 
+
+[indexへ戻る](../index-aws.ja.md)

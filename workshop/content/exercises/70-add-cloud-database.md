@@ -1,41 +1,43 @@
-In this exercise you will work with the AWS Relational Database Service (``RDS``) instance you provisioned earlier and configure your application to use it.  Amazon RDS makes it easy to set up, operate, and scale MySQL deployments in the cloud. 
+この演習では、前にプロビジョニングしたAWS Relational Database Service（``RDS``）インスタンスを操作し、それを使用するようにアプリケーションを構成します。Amazon RDSを使用すると、クラウドでのMySQLデプロイメントのセットアップ、運用、およびスケーリングが簡単になります。
 
-Check the status of the RDS instance:
+RDSインスタンスのステータスを確認します:
 
 ```execute
 svcat get instances
 ```
 
 
- - Important! Wait for the instance _status_ to become ``Ready`` before continuing. 
+ - Important! 続行する前に、インスタンスのステータスが``Ready`` になるまで待ちます。
 
 
 # Bind to the database service 
 
-Bind to the new database service (called ``mysql``) with the application by first fetching the access credentials of the database (host, username, password...): 
+最初にデータベースのアクセス資格情報（ホスト、ユーザー名、パスワード...）を取得して、アプリケーションで新しいデータベースサービス（``mysql``と呼ばれる）にバインドします。
 
-Fetch the access credentials via the `service catalogue` by using the "``bind``" command: 
+``bind``コマンドを使用して、``service catalogue``経由でアクセス認証情報を取得します：
 
 ```execute
 svcat bind mysql --name mysql-binding --secret-name mysql-secret
 ```
 
- - The binding will be called ``mysql-binding`` and the resulting Kubernetes secret will be called ``mysql-secret``. The secret will contain connection details and credentials for the RDS instance (host, username, password ...). 
- - Kubernetes secret objects let you store and manage sensitive information, such as passwords, OAuth tokens, and ssh keys. Putting this information in a secret is safer and more flexible than putting it verbatim into a container. 
 
-Check the database bindings:
+ - バインディングは``mysql-binding``となり、Kubernetesシークレットは``mysql-secret``となります。シークレットには、RDSインスタンスの接続の詳細と資格情報（ホスト、ユーザー名、パスワードなど）が含まれます。
+ - Kubernetesシークレットオブジェクトを使用すると、パスワード、OAuthトークン、sshキーなどの機密情報を保存および管理できます。この情報をシークレットに入れる方が、コンテナにそのまま入れるよりも安全で柔軟です。
+
+
+データベースのバインドを確認します:
 
 ```execute
 svcat get bindings
 ```
 
-View the secret:
+シークレットを確認します:
 
 ```execute
 oc describe secret mysql-secret 
 ```
 
-You should see the following output:
+次の出力が表示されます:
 
 ```
 Data
@@ -47,44 +49,44 @@ MASTER_USERNAME:   4 bytes
 PORT:              5 bytes
 ```
 
- - Note that if you see the error ``not found`` the secret has not been created yet.  This most likely means the RDS instance has not finished provisioning and/or the binding has not been created yet. 
+ - エラー：``not found``が表示された場合シークレットはまだ作成されていないことに注意してください。これは、RDSインスタンスがプロビジョニングを完了していないか、バインディングがまだ作成されていないことを意味します。
+
 
 
 # Verify the database is running 
 
-Let's check that the RDS instance is up and reachable. 
+RDSインスタンスが稼働中で到達可能であることを確認しましょう。
 
-Use the help script to extract the values from the secret into terminal's shell environment so the connectivity to the database can be tested. 
+ヘルプスクリプトを使用して、シークレットから端末のシェル環境に値を抽出し、データベースへの接続をテストします。
 
 ```execute
 extract-secret mysql-secret
 ```
 
-Now import this data into the shell's environment for later use: 
+後で使用するために、このデータをシェルの環境にインポートします。: 
 
 ```execute
 eval `extract-secret mysql-secret`
 ```
 
- - Note that if this command shows no output then it has succeeded. 
- - If this command returns ``not found`` wait for the database and its binding to be ``ready`` and the secret to be created from the binding. 
+ - このコマンドが出力を表示しない場合、成功しています。 
+ - このコマンドが``not foun``を返す場合、データベースとそのバインディングが``ready``となりかつ、そのバインディングからシークレットが作成されるまで待機します。 
 
-Now, access the database to check the content of the ``vote`` database:
+次に、データベースにアクセスして、``vote``データベースの内容を確認します：
 
 ```execute
 mysql -h $ENDPOINT_ADDRESS -P $PORT -u $MASTER_USERNAME -p"$MASTER_PASSWORD" -D $DB_NAME -e 'show databases;'
 ```
- The output should include the ``vote`` database.  If not, or if there is an error, wait for the database to become ready. 
- 
- Now, check if the database is empty or not.  
- 
-  - Note, the database `should be empty` if the application has not initialized it yet.
+出力には``vote``データベースが含まれている必要があります。そうでない場合、またはエラーがある場合は、データベースの準備が整うまで待ちます。
+
+次に、データベースが空かどうかを確認します。
+
+  - アプリケーションがまだ初期化していない場合は、データベースは``空``のはずです。
 
 ```execute
 mysql -h $ENDPOINT_ADDRESS -P $PORT -u $MASTER_USERNAME -p"$MASTER_PASSWORD" -D $DB_NAME -e 'show tables;'
 ```
-
-Only after the application has been configured to connect to the database and has started up, there will be any content in the database. 
+データベースに接続するようにアプリケーションを構成して起動した後にのみ、データベースにコンテンツが存在します。
 
 ```
 +----------------+
@@ -116,9 +118,9 @@ Note, that the above ``oc set env`` command would normally cause a re-deployment
 
 ## Configure the application to use the database
 
-Now, connect the application to the database by injecting the database credentials into the application.
+次に、データベース資格情報をアプリケーションに注入して、アプリケーションをデータベースに接続します。
 
-To do this, add the credentials into the application by importing them into the ``deployment`` from the secret:
+これを行うには、シークレットから``deployment``へ資格情報をインポートすることでアプリケーションに資格情報を追加します:
 
 ```execute
 oc set env dc/vote-app \
@@ -129,61 +131,60 @@ oc set env dc/vote-app \
 oc set env --from=secret/mysql-secret dc/vote-app 
 -->
 
-The previous command fetches the values from the secret ``mysql-secret`` and adds them into the deployment config, which in turn re-deploys the application. 
+前のコマンドは、シークレット：``mysql-secret``から値を取得し、それらをdeployment configへ追加し、アプリケーションを再デプロイします。
 
-Check the environment variables have been properly set:
+環境変数が適切に設定されていることを確認します：
 
 ```execute
 oc set env dc/vote-app --list
 ```
 
-The above command should show the values needed to connect to the database. 
+上記のコマンドは、データベースへの接続に必要な値が表示される必要があります。
 
-Once the application has been re-deployed, check the database has been initialized by the application:
+アプリケーションが再デプロイされたら、アプリケーションによってデータベースが初期化されたことを確認します：
 
 ```execute
 mysql -h $ENDPOINT_ADDRESS -P $PORT -u $MASTER_USERNAME -p"$MASTER_PASSWORD" -D $DB_NAME -e 'show tables;'
 ```
-
-Again, the tables (``poll`` and ``option``) should have been created.
+テーブル（``poll``および``option``）が作成されているはずです。
 
 
 ## Test the application 
 
-Post a few random votes to the application using the help-script:
+ヘルプスクリプトを使用して、アプリケーションにランダムな投票をいくつか投稿します:
 
 ```execute 
 test-vote-app http://vote-app-%project_namespace%.%cluster_subdomain%/vote.html
 ```
 
-After using the application, check the votes in the database table: 
+アプリケーションを使用した後、データベースのテーブルで投票を確認します: 
 
 ```execute
 mysql -h $ENDPOINT_ADDRESS -P $PORT -u $MASTER_USERNAME -p"$MASTER_PASSWORD" -D $DB_NAME -e 'select * from `option`;'
 ```
 
-Once the application is running again, ensure it is still working:
+アプリケーションが再び実行されたら、それがまだ機能していることを確認します。
 
 ```execute 
 curl -s http://vote-app-%project_namespace%.%cluster_subdomain%/ | grep "<title>"
 ```
 
-Test the application in a browser:
+ブラウザでアプリケーションをテストします:
 
 [Open the Vote Application](http://vote-app-%project_namespace%.%cluster_subdomain%/)
 
- - ``Note that your neighbor should also be able to access your application and submit a vote.`` 
+ - ``隣の人もあなたのアプリケーションへアクセスして投票できるはずです``
 
-After using the application and adding votes, check the votes in the database: 
+アプリケーションを使用して投票を追加した後、データベースで投票を確認します: 
 
 ```execute
 mysql -h $ENDPOINT_ADDRESS -P $PORT -u $MASTER_USERNAME -p"$MASTER_PASSWORD" -D $DB_NAME -e 'select * from `option`;'
 ```
 
 ---
-The application can be tested using curl.
+curlを使用してアプリケーションをテストできます。
 
-Post a few random votes to the application using this help-script:
+このヘルプスクリプトを使用して、アプリケーションにランダムな投票をいくつか投稿してください:
 
 ```execute 
 test-vote-app http://vote-app-%project_namespace%.%cluster_subdomain%/vote.html
@@ -199,30 +200,29 @@ done
 ```
 -->
 
-To view the results use the following command. You should see the totals of all the voting options:
+結果を表示するには、次のコマンドを使用します。すべての投票オプションの合計が表示されます。:
 
 ```execute 
 curl -s http://vote-app-%project_namespace%.%cluster_subdomain%/results.html | grep "data: \["
 ```
 
-You should see something like the following, showing all the cast votes: 
+次のように、すべての票が表示されます。: 
 
 ```
   data: [ "3",  "3",  "2",  "0",  "1",  "5",  "1",  "3",  "2", ],
 
 ```
 
-Or, view the results page in a browser:
+または、ブラウザで結果ページを表示します:
 
 [View Results page](http://vote-app-%project_namespace%.%cluster_subdomain%/results.html)
 
 
 ---
-That's the end of this exercise.  
+これでこの演習は終わりです。
 
-In this exercise you provisioned a RDS database in a container and connected the application to it. 
-
-
+この演習では、コンテナにRDSデータベースをプロビジョニングし、アプリケーションをそれに接続しました。
 
 
+[indexへ戻る](../index-aws.ja.md)
 

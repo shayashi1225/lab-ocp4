@@ -1,24 +1,24 @@
-In this exercise you will clean up and remove the provisioned resources. 
+この演習では、プロビジョニングされたリソースをクリーンアップして削除します。
 
 ## Remove the RDS Instance 
 
-De-provision the production cloud based database. 
+本番クラウドベースのデータベースのプロビジョニングを解除します。
 
-First, the binding needs to be removed.  This means removing the credentials and the secret.  This can best be done through the service catalogue: 
+まず、バインディングを削除する必要があります。これは、資格情報とシークレットを削除することを意味します。これは、サービスカタログを介して行うのが最適です： 
 
 ```execute
 svcat unbind --name mysql-binding
 ```
 
-... and then the MySQL service can be de-provisioned:
+...そして、MySQLサービスのプロビジョニングを解除します:
 
 ```execute
 svcat deprovision mysql 
 ```
 
-The MySQL instance will be removed which takes about 5 to 10 minutes.  
+MySQLインスタンスは削除され、約5〜10分かかります。
 
-Check the progress here:
+ここで進行状況を確認します：
 
 ```execute
 svcat get instances 
@@ -26,23 +26,23 @@ svcat get instances
 
 ## Remove the application and the container database
 
-Now, remove the container based database 
+次に、コンテナベースのデータベースを削除します 
 
 ```execute 
 oc delete all --selector=app=db 
 ```
 
-Notice how is it easy to remove parts of an application using the `selector` option and the name of the label `app=db`. 
+`selector`オプションと`app=db`ラベルの名前を使用して、特定のアプリケーションを簡単に削除できるます。
 
-Now, remove the application  
+アプリケーションを削除します：
 
 ```execute 
 oc delete all --selector=app=vote-app  
 ```
 
-Again, we use the `selector` to remove only a part of the application. 
+アプリケーションの一部のみを削除するためには、 `selector`を使用します。
+念のため、プロジェクトからすべてを削除します：
 
-Just to be sure, remove everything from the project: 
 
 ```execute 
 oc delete all --all & 
@@ -50,18 +50,19 @@ oc delete all --all &
 
 ## Optionally, delete your GitHub repository ``flask-vote-app``
 
-To do this, log into GitHub.com, find the ``flask-vote-app`` repository, click on the repository ``Settings`` and, at the bottom of the page, click on the ``Delete this Repository`` button. 
+これを行うには、GitHub.comにログインして``flask-vote-app``リポジトリを見つけ、リポジトリをクリックし``Settings``、ページの下部にある``Delete this Repository``ボタンをクリックします。
 
-Also, go to https://github.com/settings/tokens and delete the token named ``hub for...``.  
+また、 [https://github.com/settings/token](https://github.com/settings/token)へアクセスして、　``hub for...`` というトークンを削除します.  
 
 ## Remove the local GitHub personal access token  
-
-At the start of this workshop you forked a GitHub repository.  A token was generated to allow further access to the repository.  Now, delete this token:
+このワークショップの開始時に、GitHubリポジトリをフォークしました。リポジトリにさらにアクセスできるようにするために、トークンが生成されました。次に、このトークンを削除します:
 
 ```execute 
 rm -f ~/.gitconfig ~/.config/hub 
 ```
 
 ---
-That's the end of this exercise.
+これでこの演習は終わりです。
 
+
+[indexへ戻る](../index-aws.ja.md)

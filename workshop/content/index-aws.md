@@ -1,18 +1,18 @@
-This is a half-day workshop to learn how to simplify application development using Red Hat OpenShift Container Platform on AWS. In this self-paced lab, we will walk through how you can containerize applications on AWS.
+これは、AWSでRed Hat OpenShift Container Platformを使用してアプリケーション開発を簡素化する方法を学ぶ半日ワークショップです。この自習型ラボでは、AWSでアプリケーションをコンテナ化する方法について説明します。
 
-Red Hat and AWS are working together to make deploying applications inside of containers a seamless process by allowing customers to deploy and manage Red Hat OpenShift Container Platform while integrating with AWS native services.
+Red HatとAWSは、顧客がAWSネイティブサービスと統合しながらRed Hat OpenShift Container Platformをデプロイおよび管理できるようにすることで、コンテナー内にアプリケーションをデプロイするシームレスなプロセスを実現するために協力しています。
 
-Join us to learn how to:
+次の方法を学びます：
 
-- Easily build and extend traditional and container-based enterprise applications, leveraging the power of AWS compute,
-database, analytics, machine learning, networking, mobile and various application services
+- AWSコンピューティング、データベース、分析、機械学習、ネットワーキング、モバイル、さまざまなアプリケーションサービスの力を活用して、従来のコンテナベースのエンタープライズアプリケーションを簡単に構築および拡張する
 
-- We will also share how Red Hat and AWS can help you put DevOps, containers and OpenShift cloud infrastructure to work for your business
- 	 
-Who Should Attend:
+- また、Red HatとAWSがどのようにDevOps、コンテナ、OpenShiftクラウドインフラストラクチャをビジネスに活用できるかを共有する
 
-- Cloud, Application and Infrastructure Architects
-- Cloud, Application and IT Systems Administrators
-- IT Operations and Systems Managers
-- Developers
+想定対象者：
+
+- クラウド、アプリケーション、インフラストラクチャアーキテクト
+- クラウド、アプリケーション、およびITシステム管理者
+- IT運用およびシステムマネージャー
+- 開発者
+
 

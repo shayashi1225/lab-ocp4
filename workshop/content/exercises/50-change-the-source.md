@@ -1,10 +1,9 @@
-In this exercise you will make a change in the source code and rebuild/re-deploy the container.
+この演習では、ソースコードを変更し、コンテナを再構築/再デプロイします。
 
 # Change the application source code 
 
-You can either make a source code change using an editor or you can use the below ``sed`` command.
-
-First, make sure you are in the correct source code directory:
+エディタを使用してソースコードを変更するか、以下の``sed``コマンドを使用できます。
+まず、正しいソースコードディレクトリにいることを確認します。
 
 ```execute
 cd ~/flask-vote-app
@@ -19,24 +18,23 @@ nano seeds/seed_data.json
 Once you have made the change, save the file using ``CTL-X``, then ``Y`` and then hit ``ENTER``.  
 -->
 
-Use the following command to substitute some text in the voting definition file for you:
+次のコマンドを使用して、投票定義ファイルの一部のテキストを置き換えます：
 
 ```execute
 sed -i "s/avourite distribution/avourite Linux Distribution/" seeds/seed_data.json
 ```
+ソースコードに変更を加えました。単語を``Distribution``へ変更しました。開発者として、あなたは今、’ローカルワークステーション’上で、アプリケーションのビルドと’test’を行いたいはずです。そのあとGitHubへ変更の``commit`` と ``push``を行いたいはずです。
 
-You have just made a change to the source code. You have changed the word to "``Distribution``".  As a developer, you would now want to build and 'test' the application on your 'local workstation' and after you are happy that it works you would ``commit`` and ``push`` the changes to GitHub. 
-
-Check the changes you made with git:
+gitで行った変更を確認します:
 
 ```execute
 git status
 ```
 
-Git should show you that you made a change in the seed_data.json file:
+Gitは、seed_data.jsonファイルに変更を加えたことを示します:
  - ``modified:   seeds/seed_data.json``.
 
-Git can also show you the exact changes you are about to commit:
+Gitは、コミットしようとしている変更を表示することもできます。
 
 ```execute
 git diff seeds/seed_data.json
@@ -44,42 +42,39 @@ git diff seeds/seed_data.json
 
 # Commit and push the changes 
 
-Commit the changes: 
+変更をコミットします: 
 
 ```execute
 git commit -m "Important change" . 
 ```
 
- - ``After the next command, if you had set up the GitHub webhook in the previous exercise, you should see the source to image build starting automatically.  You will see a build pod running in the lower terminal.``
+ - ``次のコマンドの後、前の演習でGitHub webhookをセットアップしていた場合、ソースからイメージへのビルドが自動的に開始されるのが見えるはずです。下のターミナルでビルドポッドが実行されているのがわかります。``
 
-Now, push the changes to GitHub:
+次に、変更をGitHubにプッシュします:
 
 ```execute
 git push 
 ```
 
-``If you set up a Webhook`` in the previous exercise, you should see the build automatically starting. Take a look at the lower terminal window and you should see ``vote-app-2-build    1/1     Running``. 
+前の演習でWebhookを設定していた場合は、ビルドが自動的に開始されるのを確認できます。下のターミナルウィンドウを見てください、``vote-app-2-build 1/1 Running`` が確認できるはずです。
 
 
-
- - ``Warning: If you DID NOT set up a webhook in the previous exercise, trigger a new build manually with the following command``: 
+ - ``Warning: 前の演習でWebhookをセットアップしなかった場合、次のコマンドを使用して新しいビルドを手動でトリガーします``
 
 ```execute
 # ONLY RUN IF YOU DID NOT SET UP THE WEBHOOK IN THE PREVIOUS LAB
 oc start-build vote-app   
 ```
 
-Ensure the build is running before continuing. 
+続行する前にビルドが実行されていることを確認してください。
 
-Again, follow the build progress:
-
+繰り返しますが、ビルドの進行状況を確認してください：
 ```execute
 oc logs bc/vote-app --follow
 ```
+pythonアプリケーションが再構築され、新しいイメージが内部レジストリにコミット/プッシュされるのが見えるはずです。アプリケーションを自動的に再デプロイする必要があります。注、これは、数分かかることがあります。特に``Copying blob...``と``Storing signatures``が遅くなることがあります。
 
-You should see the python application being built again and a new image being committed/pushed into the internal registry. The application should be re-deployed automatically.   Note, this can take a few minutes, especially the ``Copying blob...`` and the ``Storing signatures`` operations can be slow. 
-
-Once the new pod is up and running, check the change you just made has been deployed properly. 
+新しいPodが起動して実行されたら、行った変更が適切に展開されていることを確認します。
 
 # Verify the application changes 
 
@@ -87,22 +82,24 @@ Once the new pod is up and running, check the change you just made has been depl
 curl -s http://vote-app-%project_namespace%.%cluster_subdomain%/ | grep "<title>"
 ```
 
-The output should include your change, for example:
+出力には、次のような変更が含まれている必要があります。
 
 ```
     <title>Favourite Linux Distribution</title>
 ```
 
- - ``If this does not work, go back and check that the build had finished successfully and that the application has been re-deployed.``
+ - ``これが機能しない場合は、戻ってビルドが正常に終了し、アプリケーションが再デプロイされていることを確認します``
 
-Test the application in a browser with the following URL:
+次のURLを使用して、ブラウザーでアプリケーションをテストします:
 
 [Open the Vote Application](http://vote-app-%project_namespace%.%cluster_subdomain%/)
 
 
 ---
-That's the end of this exercise.
+これでこの演習は終わりです。
 
-You now know how to make changes to your code and test the results.  Next you will connect the vote application to a database. 
+これで、コードを変更して結果をテストする方法がわかりました。次に、投票アプリケーションをデータベースに接続します。
 
 
+
+[indexへ戻る](../index-aws.ja.md)
